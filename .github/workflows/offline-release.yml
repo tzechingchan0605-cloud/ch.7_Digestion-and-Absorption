@@ -1,0 +1,32 @@
+name: Publish offline edition
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: offline-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Verify science model
+        run: node --test tests/model.test.cjs
+      - name: Package self-contained offline app
+        run: python3 tools/package.py
+      - name: Publish downloadable offline edition
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="offline-${GITHUB_SHA}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/digestion-offline.zip dist/digestion-offline.html --clobber
+          else
+            gh release create "$tag" dist/digestion-offline.zip dist/digestion-offline.html --target "$GITHUB_SHA" --title "Offline edition ${GITHUB_SHA:0:7}" --notes "Download digestion-offline.zip, extract all files into one folder, then open index.html. No internet connection or installation is required. / 下載並解壓全部檔案至同一資料夾，開啟 index.html 即可離線使用。"
+          fi
