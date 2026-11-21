@@ -188,8 +188,8 @@ const STRUCTURES = {
     name: ['Appendix', '闌尾'],
     role: ['Branch of the caecum', '與盲腸相連'],
     summary: [
-      'The appendix is a narrow, blind-ended tube attached to the caecum. The main food pathway continues from the caecum into the colon.',
-      '闌尾是一端封閉的細管，與盲腸相連。未能消化的物質由盲腸進入結腸。'
+      'The appendix is a narrow, blind-ended branch of the caecum. Food does not normally pass through it. Undigested material moves from the ileum into the caecum and then into the colon.',
+      '闌尾是連接盲腸的一端封閉的細管。食物通常不會經過闌尾。未能消化的物質由迴腸進入盲腸，再進入結腸。'
     ],
     related: ['caecum']
   }

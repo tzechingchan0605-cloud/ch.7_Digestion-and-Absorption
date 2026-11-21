@@ -145,7 +145,9 @@ function simulation() {
       <section class="card pad anatomy-index">
         <h2>${tr('route')}</h2>
         <h3>${tr('canal')}</h3><div class="options" id="canal-options">${organOptions(FOOD_PATH)}</div>
-        <h3>${tr('accessory')}</h3><div class="options" id="accessory-options">${organOptions(ASSOCIATED)}</div>
+      </section>
+      <section class="card pad anatomy-index">
+        <h2>${tr('accessory')}</h2><div class="options" id="accessory-options">${organOptions(ASSOCIATED)}</div>
       </section>
     </div>
   </div>`;
@@ -159,11 +161,11 @@ function paintJourney(updateOrgan = false) {
   const segment = byId('food-segment-' + current.index);
   const point = segment.getPointAtLength(segment.getTotalLength() * current.fraction);
   const focus = state.closeup || state.follow ? state.organ : null;
+  const showMarker = state.foodMarker && focus !== 'appendix';
   marker.setAttribute('cx', point.x);
   marker.setAttribute('cy', point.y);
-  marker.hidden = !state.foodMarker;
-  marker.style.visibility = state.foodMarker ? 'visible' : 'hidden';
-  if (body3d) body3d.draw({ angle: state.angle, selected: state.organ, inside: state.inside, focus, labels: state.labels, foodPoint: state.foodMarker ? point : null });
+  marker.style.visibility = showMarker ? 'visible' : 'hidden';
+  if (body3d) body3d.draw({ angle: state.angle, selected: state.organ, inside: state.inside, focus, labels: state.labels, foodPoint: showMarker ? point : null });
   byId('progress').value = 100 * (current.index + current.fraction) / FOOD_PATH.length;
   byId('play').textContent = tr(state.playing ? 'pause' : current.fraction === 1 ? 'replay' : state.elapsed ? 'resume' : 'play');
   byId('previous').disabled = !current.index;
@@ -298,6 +300,7 @@ function bindRotation() {
 }
 
 function chooseOrgan(id) {
+  if (id === 'appendix') state.playing = false;
   state.organ = id;
   state.closeup = true;
   state.follow = false;

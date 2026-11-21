@@ -16,14 +16,14 @@ const AnatomicalDrawing = (() => {
     ileum: { colour: '#e7ad8b', tube: 'M289 307C323 320 321 336 279 337C242 337 204 333 203 351C202 369 263 352 302 359C329 365 322 381 294 382C262 385 200 376 204 395C207 413 274 388 307 402C323 411 303 427 276 421C241 417 209 415 201 433L182 435', width: 16, z: 3, label: [377, 393] },
     caecum: { colour: '#bd7669', shape: 'M167 423Q180 418 190 435L191 448Q189 460 178 459Q161 457 163 443Z', volume: [177, 441, 9, 13, 19, 13], label: [101, 426] },
     colon: { colour: '#bd7669', tube: 'M176 441C174 420 170 392 172 366L173 339Q174 319 192 320Q257 328 321 318Q339 318 342 336C348 360 340 395 344 418Q347 447 327 454Q314 458 294 450Q273 443 266 466', width: 23, z: 13, label: [376, 353] },
-    appendix: { colour: '#ac635e', tube: 'M175 452Q168 462 178 474', width: 7, z: 8, label: [101, 473] },
+    appendix: { colour: '#ac635e', tube: 'M173 455C165 458 157 466 160 477', width: 7, z: 8, label: [101, 473] },
     rectum: { colour: '#b56f65', tube: 'M266 466Q259 481 265 500', width: 16, z: 8, label: [352, 476] },
     anus: { colour: '#99605d', shape: 'M257 498Q266 494 273 499L271 508Q266 513 259 508Z', volume: [265, 503, 8, 8, 6, 8], label: [352, 512] }
   };
   const routeSegments = [
     'M214 98Q236 97 250 103', organs.pharynx.tube, organs.oesophagus.tube,
     'M269 238C294 228 316 239 308 259C300 284 254 280 228 273',
-    organs.duodenum.tube, organs.ileum.tube, 'M182 435Q179 443 176 441',
+    organs.duodenum.tube, organs.ileum.tube, 'M182 435Q177 436 176 441',
     organs.colon.tube, organs.rectum.tube, 'M265 500L265 510'
   ];
   const body = '<path d="M205 88Q201 83 208 78Q202 53 219 37Q241 14 272 25Q305 30 307 68Q308 86 291 113L286 140Q304 150 332 157Q372 164 381 194L403 329Q405 353 393 360Q384 362 377 337L356 261Q351 290 363 340Q373 392 357 457L350 526H285L271 510L251 526H165L154 461Q133 408 144 353Q155 300 151 267L127 337Q121 358 110 354Q101 350 106 329L128 202Q134 168 173 158Q205 150 216 134L223 116Q212 115 210 107L200 102Z" fill="#f8faf7" stroke="#c0d2c7" stroke-width="1.6"/>';
@@ -33,7 +33,7 @@ const AnatomicalDrawing = (() => {
     return `<svg id="anatomy-svg" viewBox="0 12 500 530" aria-label="${label}">${body}
       ${layerOrder.map(id => {
         const o = organs[id];
-        const centre = o.volume ? o.volume.slice(0, 2) : ({pharynx:[256,117],oesophagus:[255,170],bileDuct:[225,279],pancreaticDuct:[276,291],duodenum:[212,294],ileum:[274,372],colon:[343,356],appendix:[174,468],rectum:[266,492]})[id];
+        const centre = o.volume ? o.volume.slice(0, 2) : ({pharynx:[256,117],oesophagus:[255,170],bileDuct:[225,279],pancreaticDuct:[276,291],duodenum:[212,294],ileum:[274,372],colon:[343,356],appendix:[160,472],rectum:[266,492]})[id];
         const [x, y] = o.label;
         const anchor = x < 250 ? 'end' : 'start';
         const graphic = o.tube

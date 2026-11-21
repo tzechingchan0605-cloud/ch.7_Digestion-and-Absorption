@@ -26,10 +26,21 @@ async function main() {
     assert.equal(await page.locator('html').getAttribute('lang'), 'en-GB');
     assert.equal(await heading(), 'Mouth cavity');
     await page.screenshot({ path: '/tmp/digestion-desktop.png', fullPage: true });
+    const canal = page.locator('#canal-options');
+    assert.equal(await canal.getByRole('button', { name: 'Appendix' }).count(), 0);
+    await page.locator('#accessory-options').getByRole('button', { name: 'Appendix' }).click();
+    assert.match(await page.locator('#selection').innerText(), /Food does not normally pass through it/);
+    assert.equal(await page.locator('#food-marker').evaluate(marker => getComputedStyle(marker).visibility), 'hidden');
+    await action('reset').click();
     await step(1);
     assert.equal(await heading(), 'Pharynx');
     await step(1);
     assert.equal(await heading(), 'Oesophagus');
+    for (const expected of ['Stomach', 'Duodenum', 'Ileum', 'Caecum', 'Colon']) {
+      await step(1);
+      assert.equal(await heading(), expected);
+    }
+    for (let i = 0; i < 5; i++) await step(-1);
     await page.locator('#language').click();
     assert.equal(await page.locator('html').getAttribute('lang'), 'zh-HK');
     assert.equal(await heading(), '食道');
