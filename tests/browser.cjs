@@ -48,7 +48,22 @@ async function main() {
     await page.locator('#inside').check();
     assert.match(await page.locator('#cutaway').innerText(), /乳糜管/);
     await action('observation', 'molecules').click();
-    assert.match(await page.locator('#selection').innerText(), /胰澱粉酶|麥芽糖酶/);
+    const reactions = page.locator('.reaction-table');
+    assert.equal(await reactions.locator('caption').innerText(), '小腸');
+    assert.deepEqual(await reactions.locator('th').allInnerTexts(), ['碳水化合物', '蛋白質', '脂質']);
+    const equations = await reactions.locator('td').allInnerTexts();
+    assert.match(equations[0], /澱粉\s+胰澱粉酶\s+↓\s+麥芽糖\s+麥芽糖酶\s+↓\s+葡萄糖/);
+    assert.match(equations[1], /蛋白質\s+蛋白酶\s+↓\s+較短的肽\s+蛋白酶\s+↓\s+氨基酸/);
+    assert.match(equations[2], /脂質\s+膽鹽的乳化作用\s+↓\s+小油滴\s+脂肪酶\s+↓\s+脂肪酸 \+ 甘油/);
+    await page.locator('#language').click();
+    assert.match(await reactions.locator('td').first().innerText(), /Pancreatic amylase\s+↓/);
+    await page.locator('#language').click();
+    for (const [organ, column, enzyme] of [['mouth', 0, '唾液澱粉酶'], ['stomach', 1, '胃蛋白酶'], ['duodenum', 0, '胰澱粉酶']]) {
+      await page.locator(`#canal-options button[data-value="${organ}"]`).click();
+      await action('observation', 'molecules').click();
+      assert.equal(await reactions.locator('td').nth(column).locator('.reaction-arrow span').first().innerText(), enzyme);
+      if (organ !== 'duodenum') assert.equal(await reactions.locator('.reaction-chain').count(), 1);
+    }
     assert.equal(await page.locator('#body-canvas, button[data-action="view"], #meal').count(), 0);
     assert.deepEqual(await page.locator('button[data-action="observation"]').allInnerTexts(), ['器官', '分子']);
     await page.locator('#condition').selectOption('lactose');

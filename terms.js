@@ -255,28 +255,45 @@ const CONDITIONS = {
   diarrhoea: ['Fast colonic transit', '結腸蠕動加快']
 };
 
+const REACTION_CATEGORIES = [
+  ['Carbohydrates', '碳水化合物'],
+  ['Proteins', '蛋白質'],
+  ['Lipids', '脂質']
+];
+
 const MOLECULAR = {
   mouth: [
-    ['Starch → maltose (salivary amylase)', '澱粉 → 麥芽糖（唾液澱粉酶）'],
-    ['Chewing reduces the size of food pieces.', '咀嚼把食物嚼成小塊。']
+    { start: ['Starch', '澱粉'], steps: [
+      [['Salivary amylase', '唾液澱粉酶'], ['Maltose', '麥芽糖']]
+    ] },
+    null,
+    null
   ],
   stomach: [
-    ['Proteins → peptides (pepsin)', '蛋白質 → 肽（胃蛋白酶）'],
-    ['Churning mixes food with gastric juice to form chyme.', '攪動把食物與胃液混合，形成食糜。']
+    null,
+    { start: ['Proteins', '蛋白質'], steps: [
+      [['Pepsin', '胃蛋白酶'], ['Peptides', '肽']]
+    ] },
+    null
   ],
-  duodenum: [
-    ['Starch → maltose (pancreatic amylase)', '澱粉 → 麥芽糖（胰澱粉酶）'],
-    ['Lipids → small oil droplets (emulsification by bile salts)', '脂質 → 小油滴（膽鹽的乳化作用）'],
-    ['Lipids → fatty acids + glycerol (lipase)', '脂質 → 脂肪酸 + 甘油（脂肪酶）'],
-    ['Proteins → peptides → amino acids (proteases)', '蛋白質 → 肽 → 氨基酸（蛋白酶）']
-  ],
-  ileum: [
-    ['Maltose → glucose (maltase)', '麥芽糖 → 葡萄糖（麥芽糖酶）'],
-    ['Peptides → amino acids (proteases)', '肽 → 氨基酸（蛋白酶）'],
-    ['Monosaccharides and amino acids → blood capillaries', '單糖和氨基酸 → 微血管'],
-    ['Fatty acids + glycerol → oil droplets in epithelial cells → lacteals', '脂肪酸 + 甘油 → 上皮細胞內的小油滴 → 乳糜管']
+  smallIntestine: [
+    { start: ['Starch', '澱粉'], steps: [
+      [['Pancreatic amylase', '胰澱粉酶'], ['Maltose', '麥芽糖']],
+      [['Maltase', '麥芽糖酶'], ['Glucose', '葡萄糖']]
+    ] },
+    { start: ['Proteins', '蛋白質'], steps: [
+      [['Protease', '蛋白酶'], ['Shorter peptides', '較短的肽']],
+      [['Protease', '蛋白酶'], ['Amino acids', '氨基酸']]
+    ] },
+    { start: ['Lipids', '脂質'], steps: [
+      [['Emulsification by bile salts', '膽鹽的乳化作用'], ['Small oil droplets', '小油滴']],
+      [['Lipase', '脂肪酶'], ['Fatty acids + glycerol', '脂肪酸 + 甘油']]
+    ] }
   ]
 };
+
+COPY.smallIntestine = ['Small intestine', '小腸'];
+COPY.noReaction = ['No reaction shown', '沒有相關反應'];
 
 const CONDITION_NOTES = {
   lactose: ['Less lactose in milk and ice cream can be broken down into absorbable sugars.', '牛奶和雪糕中的乳糖較難分解成可吸收的糖。'],

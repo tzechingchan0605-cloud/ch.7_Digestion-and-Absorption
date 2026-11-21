@@ -205,9 +205,25 @@ function observation() {
       ${data.related ? `<h3>${tr('related')}</h3><div class="options">${organOptions(data.related)}</div>` : ''}
     </div>`;
   }
-  const facts = MOLECULAR[state.organ];
+  const site = ['duodenum', 'ileum'].includes(state.organ) ? 'smallIntestine' : state.organ;
+  const reactions = MOLECULAR[site];
   return `<div class="study-copy"><p class="badge">${organName(state.organ)}</p><h2 id="selection-heading">${tr('molecules')}</h2>
-    ${facts ? `<ul class="facts">${facts.map(item => `<li>${text(item)}</li>`).join('')}</ul>` : `<p>${text(data.summary)}</p>`}</div>`;
+    ${reactions ? reactionTable(reactions, site === 'smallIntestine' ? tr(site) : organName(site)) : `<p>${text(data.summary)}</p>`}</div>`;
+}
+
+function reactionTable(reactions, siteName) {
+  return `<table class="reaction-table">
+    <caption>${siteName}</caption>
+    <thead><tr>${REACTION_CATEGORIES.map(category => `<th scope="col">${text(category)}</th>`).join('')}</tr></thead>
+    <tbody><tr>${reactions.map(reaction => `<td>${reaction
+      ? `<div class="reaction-chain">
+          <strong>${text(reaction.start)}</strong>
+          ${reaction.steps.map(([process, product]) => `
+            <div class="reaction-arrow"><span>${text(process)}</span><span aria-hidden="true">↓</span></div>
+            <strong>${text(product)}</strong>`).join('')}
+        </div>`
+      : `<span aria-label="${tr('noReaction')}">—</span>`}</td>`).join('')}</tr></tbody>
+  </table>`;
 }
 
 function graph(samples, labels, max, axis, elapsed) {
