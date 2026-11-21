@@ -49,26 +49,14 @@ async function main() {
     assert.match(await page.locator('#cutaway').innerText(), /乳糜管/);
     await action('observation', 'molecules').click();
     assert.match(await page.locator('#selection').innerText(), /胰澱粉酶|麥芽糖酶/);
-    await action('view', '3d').click();
-    const canvas = page.locator('#body-canvas');
-    const before = await canvas.evaluate(el => el.toDataURL());
-    await page.locator('#angle').focus();
-    await page.locator('#angle').press('End');
-    assert.notEqual(await canvas.evaluate(el => el.toDataURL()), before);
-
-    await action('observation', 'meal').click();
-    await page.locator('#meal').selectOption('milk');
+    assert.equal(await page.locator('#body-canvas, button[data-action="view"], #meal').count(), 0);
+    assert.deepEqual(await page.locator('button[data-action="observation"]').allInnerTexts(), ['器官', '分子']);
     await page.locator('#condition').selectOption('lactose');
     assert.match(await page.locator('#condition-description').innerText(), /乳糖/);
     await page.locator('#speed').selectOption('60');
     await action('play').click();
     await page.waitForFunction(() => document.getElementById('progress').value > 25);
     await action('play').click();
-    await action('observation', 'graph').click();
-    assert.equal(await page.locator('svg.graph').count(), 1);
-    await action('observation', 'meal').click();
-    await action('record').click();
-
     await action('mode', 'experiment').click();
     await page.locator('#lab-identify').selectOption('stomach');
     await action('run').click();
@@ -136,7 +124,6 @@ async function main() {
 
     await page.setViewportSize({ width: 390, height: 844 });
     await action('mode', 'simulate').click();
-    await action('view', '2d').click();
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     await page.screenshot({ path: '/tmp/digestion-mobile.png', fullPage: true });
     await page.reload();
@@ -154,7 +141,7 @@ async function main() {
       assert.equal(await page.locator('#selection-heading').innerText(), '口腔');
       await offline.close();
     }
-    console.log('PASS: journey, anatomy, rotation, language, seven practicals, CSV, practice and scored quiz, mobile, offline.');
+    console.log('PASS: journey, 2D anatomy, language, seven practicals, CSV, practice and scored quiz, mobile, offline.');
   } finally {
     await browser.close();
   }

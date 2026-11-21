@@ -8,19 +8,15 @@ try {
 
 const state = {
   mode: 'simulate',
-  view: '2d',
   organ: 'mouth',
-  angle: 0,
   closeup: false,
   follow: false,
   inside: false,
   labels: true,
   acidity: false,
   foodMarker: true,
-  meal: 'plate',
   chewing: 'chew',
   condition: 'normal',
-  units: 'si',
   observation: 'organ',
   speed: 'auto',
   elapsed: 0,
@@ -45,7 +41,6 @@ const state = {
   roundIndex: 0,
   roundComplete: false
 };
-let body3d;
 
 const byId = id => document.getElementById(id);
 const text = value => value[language === 'zh' ? 1 : 0];
@@ -83,9 +78,7 @@ function render() {
   languageBar();
   byId('app').innerHTML = (state.mode === 'simulate' ? simulation() : state.mode === 'experiment' ? experiments() : quizzes()) + notebook();
   if (state.mode === 'simulate') {
-    body3d = state.view === '3d' ? AnatomicalDrawing.renderer(byId('body-canvas'), byId('anatomy-svg'), organName) : null;
     paintJourney(true);
-    if (body3d) bindRotation();
   } else if (state.mode === 'experiment') {
     paintPractical();
   }
@@ -100,16 +93,13 @@ function simulation() {
     <div class="stack">
       <section class="card stage-card" aria-labelledby="anatomy-heading">
         <div class="card-head"><h2 id="anatomy-heading">${tr('diagram')}</h2>
-          <div class="segment">${['2d','3d'].map(id => toggle(id.toUpperCase(), 'view', id, state.view === id)).join('')}</div>
         </div>
         <div class="stage">
-          <div id="body-flat" ${state.view === '3d' ? 'hidden' : ''}>${AnatomicalDrawing.svg(organName, tr('diagram'))}</div>
-          ${state.view === '3d' ? `<canvas id="body-canvas" width="500" height="520" role="img" aria-label="${tr('diagram')}"></canvas>` : ''}
+          ${AnatomicalDrawing.svg(organName, tr('diagram'))}
           <div id="cutaway" hidden></div>
         </div>
         <div class="stage-controls">
           ${checkbox('labels', tr('labels'))}${checkbox('inside', tr('inside'))}${checkbox('acidity', tr('acidity'))}${checkbox('foodMarker', tr('foodMarker'))}
-          ${state.view === '3d' ? `<label>${tr('rotate')} <input id="angle" data-setting="angle" type="range" min="-180" max="180" value="${state.angle}"></label>` : ''}
           <span class="stage-note">${tr('schematic')}</span>
         </div>
         <div class="journey">
@@ -124,13 +114,11 @@ function simulation() {
         </div>
       </section>
       <section class="card pad">
-        <h2>${tr('meal')}</h2>
+        <h2>${tr('playbackSettings')}</h2>
         <div class="controls">
-          ${select('meal', tr('meal'), Object.entries(MEALS).map(([id, meal]) => [id, text(meal.name)]))}
           ${select('chewing', tr('chewing'), ['chew','gulp'].map(id => [id,tr(id)]))}
           ${select('condition', tr('condition'), localisedOptions(CONDITIONS))}
           ${select('speed', tr('speed'), [['auto',tr('auto')],['1','1 '+tr('minuteSecond')],['10','10 '+tr('minuteSecond')],['60','1 '+tr('hourSecond')]])}
-          ${select('units', tr('units'), [['si','SI (g, mL)'],['us','US (oz, fl oz)']])}
         </div>
         <p class="muted" id="condition-description"></p>
         <p class="muted">${tr('illustrative')}</p>
@@ -138,9 +126,8 @@ function simulation() {
     </div>
     <div class="stack">
       <section class="card pad study" aria-labelledby="selection-heading">
-        <div class="options">${['organ','meal','molecules','graph','status'].map(id => toggle(tr(id), 'observation', id, state.observation === id)).join('')}</div>
+        <div class="options">${['organ','molecules'].map(id => toggle(tr(id), 'observation', id, state.observation === id)).join('')}</div>
         <div id="selection"></div>
-        ${state.observation === 'meal' ? `<div class="actions">${button(tr('record'), 'record', '', 'id="record"')}</div>` : ''}
       </section>
       <section class="card pad anatomy-index">
         <h2>${tr('route')}</h2>
@@ -155,7 +142,6 @@ function simulation() {
 
 function paintJourney(updateOrgan = false) {
   const current = journey();
-  const id = FOOD_PATH[current.index];
   const svg = byId('anatomy-svg');
   const marker = byId('food-marker');
   const segment = byId('food-segment-' + current.index);
@@ -165,7 +151,6 @@ function paintJourney(updateOrgan = false) {
   marker.setAttribute('cx', point.x);
   marker.setAttribute('cy', point.y);
   marker.style.visibility = showMarker ? 'visible' : 'hidden';
-  if (body3d) body3d.draw({ angle: state.angle, selected: state.organ, inside: state.inside, focus, labels: state.labels, foodPoint: showMarker ? point : null });
   byId('progress').value = 100 * (current.index + current.fraction) / FOOD_PATH.length;
   byId('play').textContent = tr(state.playing ? 'pause' : current.fraction === 1 ? 'replay' : state.elapsed ? 'resume' : 'play');
   byId('previous').disabled = !current.index;
@@ -180,7 +165,7 @@ function paintJourney(updateOrgan = false) {
       group.dataset.dim = Boolean(focus && !selected);
       group.querySelector('.organ-label').style.display = state.labels ? '' : 'none';
     });
-    if (focus && state.view === '2d') {
+    if (focus) {
       const bounds = svg.querySelector(`[data-organ="${focus}"] .organ`).getBBox();
       const cx = bounds.x + bounds.width / 2, cy = bounds.y + bounds.height / 2;
       svg.setAttribute('viewBox', `${Math.max(0,Math.min(188,cx - 156))} ${Math.max(12,Math.min(220,cy - 165))} 312 330`);
@@ -191,9 +176,7 @@ function paintJourney(updateOrgan = false) {
     const cutaway = byId('cutaway');
     cutaway.hidden = !state.inside || !['stomach', 'ileum'].includes(state.organ);
     if (!cutaway.hidden) cutaway.innerHTML = organCutaway(state.organ);
-  }
-  if (updateOrgan || state.observation !== 'organ' && state.observation !== 'molecules') {
-    byId('selection').innerHTML = observation(current, id);
+    byId('selection').innerHTML = observation();
   }
 }
 
@@ -212,13 +195,9 @@ function organCutaway(id) {
   </svg></div>`;
 }
 
-function observation(current, stageId) {
+function observation() {
   const data = STRUCTURES[state.organ];
-  const selectedMeal = MEALS[state.meal];
-  const absorbed = M.mealReading(selectedMeal.amount, current, state.condition, state.meal);
   const acidity = { mouth: 'pH 6–7', stomach: 'pH 1–3', duodenum: 'pH 6–8', ileum: 'pH 7–8' };
-  const phase = current.fraction === 1 ? tr('finished') : organName(stageId);
-  const heading = `<p class="badge">${phase} · ${tr('modelTime')} ${fmt(state.elapsed)} ${language === 'zh' ? '分鐘' : 'min'}</p>`;
   if (state.observation === 'organ') {
     return `<div class="study-copy"><p class="badge">${text(data.role)}${state.acidity && acidity[state.organ] ? ' · ' + acidity[state.organ] : ''}</p>
       <h2 id="selection-heading">${organName(state.organ)}</h2><p>${text(data.summary)}</p>
@@ -226,41 +205,9 @@ function observation(current, stageId) {
       ${data.related ? `<h3>${tr('related')}</h3><div class="options">${organOptions(data.related)}</div>` : ''}
     </div>`;
   }
-  if (state.observation === 'molecules') {
-    const facts = MOLECULAR[state.organ];
-    return `<div class="study-copy"><p class="badge">${organName(state.organ)}</p><h2 id="selection-heading">${tr('molecules')}</h2>
-      ${facts ? `<ul class="facts">${facts.map(item => `<li>${text(item)}</li>`).join('')}</ul>` : `<p>${text(data.summary)}</p>`}</div>`;
-  }
-  if (state.observation === 'graph') {
-    const [starch, protein, lipids, sugar, water] = selectedMeal.amount;
-    const samples = Array.from({ length: 31 }, (_, i) => {
-      const elapsed = current.end * i / 30;
-      return M.mealReading(selectedMeal.amount, M.stageAt(current.durations, elapsed), state.condition, state.meal)
-        .map((value, k) => selectedMeal.amount[k] ? value / selectedMeal.amount[k] * 100 : 0);
-    });
-    const active = [starch, protein, lipids, sugar, water].flatMap((value, index) => value ? [index] : []);
-    const names = ['starch','protein','lipid','sugar','water'];
-    return `<div class="study-copy">${heading}<h2 id="selection-heading">${tr('absorbed')} (%)</h2>
-      ${graph(samples.map(sample => active.map(i => sample[i])), active.map(i => tr(names[i])), 100, `${tr('modelTime')} (${language === 'zh' ? '分鐘' : 'min'})`, current.end)}
-    </div>`;
-  }
-  const names = ['starch','protein','lipid','sugar','water'];
-  const quantities = (value, i) => state.units === 'us'
-    ? `${fmt(value / (i === 4 ? 29.5735 : 28.3495))} ${i === 4 ? 'fl oz' : 'oz'}`
-    : `${fmt(value)} ${i === 4 ? 'mL' : 'g'}`;
-  if (state.observation === 'status') {
-    const energy = absorbed.slice(0,4).reduce((sum, value, i) => sum + value * (i === 2 ? 37 : 17), 0);
-    return `<div class="study-copy">${heading}<h2 id="selection-heading">${tr('status')}</h2>
-      <dl class="status-grid"><dt>${tr('stomachPH')}</dt><dd>${current.index === 3 ? '≈ 2' : '—'}</dd>
-      <dt>${tr('absorbedWater')}</dt><dd>${quantities(absorbed[4], 4)}</dd>
-      <dt>${language === 'zh' ? '已吸收營養素的能量' : 'Energy from absorbed nutrients'}</dt><dd>${state.units === 'us' ? fmt(energy / 4.184,0) + ' kcal' : fmt(energy,0) + ' kJ'}</dd></dl>
-      <p class="muted">${tr('healthNote')}</p></div>`;
-  }
-  return `<div class="study-copy">${heading}<h2 id="selection-heading">${text(selectedMeal.name)}</h2>
-    <div class="readout">${names.map((key, i) => `<div class="readout-row"><span>${tr(key)}</span>
-      <meter min="0" max="${selectedMeal.amount[i] || 1}" value="${absorbed[i]}" aria-label="${tr(key)} · ${tr('absorbed')}"></meter>
-      <span>${quantities(absorbed[i], i)} / ${quantities(selectedMeal.amount[i], i)}</span></div>`).join('')}</div>
-    <p class="muted">${tr('absorbed')} / ${tr('meal')}</p></div>`;
+  const facts = MOLECULAR[state.organ];
+  return `<div class="study-copy"><p class="badge">${organName(state.organ)}</p><h2 id="selection-heading">${tr('molecules')}</h2>
+    ${facts ? `<ul class="facts">${facts.map(item => `<li>${text(item)}</li>`).join('')}</ul>` : `<p>${text(data.summary)}</p>`}</div>`;
 }
 
 function graph(samples, labels, max, axis, elapsed) {
@@ -273,30 +220,6 @@ function graph(samples, labels, max, axis, elapsed) {
     <text x="235" y="163" text-anchor="middle">${axis}</text>
     ${labels.map((_, index) => `<polyline points="${samples.map((sample, i) => `${x(i)},${y(sample[index])}`).join(' ')}" fill="none" stroke="${palette[index]}" stroke-width="2.5" stroke-dasharray="${['0','7 3','3 4','10 4 2 4','2 3'][index]}"/>`).join('')}
     </svg><div class="legend">${labels.map((label,i) => `<span style="--series:${palette[i]}">${label}</span>`).join('')}</div>`;
-}
-
-function bindRotation() {
-  const canvas = byId('body-canvas');
-  let drag;
-  canvas.addEventListener('pointerdown', event => {
-    drag = { x: event.clientX, angle: state.angle };
-    canvas.setPointerCapture(event.pointerId);
-  });
-  canvas.addEventListener('pointermove', event => {
-    if (!drag || Math.abs(event.clientX - drag.x) < 4) return;
-    state.angle = Math.min(180, Math.max(-180, drag.angle + (event.clientX - drag.x)*.8));
-    byId('angle').value = state.angle;
-    paintJourney();
-  });
-  canvas.addEventListener('pointerup', event => {
-    if (!drag) return;
-    if (Math.abs(event.clientX - drag.x) < 4) {
-      const id = body3d.pick(event.clientX, event.clientY);
-      if (id) chooseOrgan(id);
-    }
-    drag = null;
-  });
-  canvas.addEventListener('pointercancel', () => { drag = null; });
 }
 
 function chooseOrgan(id) {
@@ -491,24 +414,13 @@ function notebook() {
 }
 
 function saveRecord() {
-  if (state.mode === 'experiment') {
-    if (!state.labRun || state.lab === 'identify') return;
-    const result = practicalResult();
-    state.records.push({
-      activity: text(PRACTICALS[state.lab].name),
-      setting: result.setting || '',
-      result: result.rows.map(([key,value]) => `${key} ${value}`).join(' · ')
-    });
-  } else {
-    const meal = MEALS[state.meal];
-    const current = journey();
-    const absorbed = M.mealReading(meal.amount, current, state.condition, state.meal);
-    state.records.push({
-      activity: tr('meal'),
-      setting: [text(meal.name),text(CONDITIONS[state.condition]),organName(FOOD_PATH[current.index])].join(' · '),
-      result: ['starch','protein','lipid','sugar','water'].map((key,i) => `${tr(key)} ${fmt(absorbed[i])} / ${fmt(meal.amount[i])} ${i === 4 ? 'mL' : 'g'}`).join(' · ')
-    });
-  }
+  if (state.mode !== 'experiment' || !state.labRun || state.lab === 'identify') return;
+  const result = practicalResult();
+  state.records.push({
+    activity: text(PRACTICALS[state.lab].name),
+    setting: result.setting || '',
+    result: result.rows.map(([key,value]) => `${key} ${value}`).join(' · ')
+  });
   render();
 }
 
@@ -560,7 +472,6 @@ const actions = {
     state.labRunning = false;
     render();
   },
-  view(value) { state.view = value; render(); },
   organ: chooseOrgan,
   observation(value) { state.observation = value; render(); },
   play() {
@@ -666,7 +577,7 @@ document.addEventListener('change', event => {
     return;
   }
   const key = control.dataset.setting;
-  if (!key || key === 'angle') return;
+  if (!key) return;
   if (key.startsWith('lab-')) {
     state.labSettings[key.slice(4)] = control.value;
     if (key !== 'lab-predict') resetTrial();
@@ -675,14 +586,8 @@ document.addEventListener('change', event => {
   }
   state[key] = control.type === 'checkbox' ? control.checked : control.value;
   if (key === 'topic') { chooseQuestion(questionPool()[0]); render(); return; }
-  if (['meal','chewing','condition'].includes(key)) resetMeal();
+  if (['chewing','condition'].includes(key)) resetMeal();
   paintJourney(true);
-});
-
-document.addEventListener('input', event => {
-  if (event.target.id !== 'angle') return;
-  state.angle = Number(event.target.value);
-  paintJourney();
 });
 
 byId('language').addEventListener('click', () => {

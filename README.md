@@ -2,12 +2,12 @@
 
 An interactive, offline-capable learning tool for Hong Kong secondary Biology. The top-right button switches between UK English and Traditional Chinese without resetting the activity. Traditional Chinese terms follow Chapter 7 of the supplied Hong Kong textbook, 《人的營養》.
 
-- **Explore** follows a meal from the mouth cavity to the anus. Select structures, switch between the original 2D anatomy and a rotatable schematic 3D model, and view organ notes, molecular reactions, absorption graphs and model readings.
+- **Explore** follows a meal from the mouth cavity to the anus. Select structures, explore the original 2D anatomy, and view organ notes and molecular reactions.
 - **Practicals** covers anatomy identification, food tests, amylase and pH, amylase and temperature, bile salts and lipase, dialysis tubing, and intestinal surface area.
 - **Quiz** has topic-based practice with explanations and a scored five-question round.
 - **Lab notebook** records observations during the session. Export CSV or use the browser's print dialog to save a PDF.
 
-The diagrams and calculations are educational models. Meal quantities, transit times, enzyme curves and condition effects are illustrative. The textbook PDF is used as a terminology and biology reference and is not included in the site.
+The diagrams and calculations are educational models. Transit times, enzyme curves and condition effects are illustrative. The textbook PDF is used as a terminology and biology reference and is not included in the site.
 
 ## Use online or offline
 
