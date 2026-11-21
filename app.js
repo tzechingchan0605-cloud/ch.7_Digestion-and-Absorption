@@ -147,7 +147,7 @@ function paintJourney(updateOrgan = false) {
   const segment = byId('food-segment-' + current.index);
   const point = segment.getPointAtLength(segment.getTotalLength() * current.fraction);
   const focus = state.closeup || state.follow ? state.organ : null;
-  const showMarker = state.foodMarker && focus !== 'appendix';
+  const showMarker = state.foodMarker && !['caecum', 'appendix'].includes(focus);
   marker.setAttribute('cx', point.x);
   marker.setAttribute('cy', point.y);
   marker.style.visibility = showMarker ? 'visible' : 'hidden';
@@ -239,7 +239,7 @@ function graph(samples, labels, max, axis, elapsed) {
 }
 
 function chooseOrgan(id) {
-  if (id === 'appendix') state.playing = false;
+  if (['caecum', 'appendix'].includes(id)) state.playing = false;
   state.organ = id;
   state.closeup = true;
   state.follow = false;

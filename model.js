@@ -6,7 +6,7 @@ function pathway(site,t,physical=true,enzyme=true){const f=enzyme&&site!=='oesop
 const routes={glucose:'blood',amino:'blood',water:'blood',minerals:'blood',vitamins:'blood',fat:'lymph',starch:'blocked',protein:'blocked'};
 function journey(chewing, condition) {
   const colonMinutes = { constipation: 1680, diarrhoea: 240 };
-  return [chewing === 'gulp' ? .08 : .33, .04, .12, 120, 25, 150, 20, colonMinutes[condition] ?? 840, 45, 2];
+  return [chewing === 'gulp' ? .08 : .33, .04, .12, 120, 25, 150, colonMinutes[condition] ?? 840, 45, 2];
 }
 function stageAt(durations, elapsed) {
   let time = Math.max(0, elapsed);
@@ -19,7 +19,7 @@ function stageAt(durations, elapsed) {
 function mealReading(amount, stage, condition, food) {
   const position = stage.index + stage.fraction;
   const intestinal = Math.min(1, Math.max(0, (position - 4) / 2));
-  const colonic = Math.min(1, Math.max(0, position - 7));
+  const colonic = Math.min(1, Math.max(0, position - 6));
   const absorptionFactor = condition === 'coeliac' ? .6 : 1;
   const enzymeFactor = condition === 'pancreas' ? .55 : 1;
   const bileFactor = condition === 'gallstones' ? .48 : 1;

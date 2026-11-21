@@ -12,11 +12,11 @@ test('meal stages and absorbable food respond to the selected model condition', 
   const end = standard.reduce((a, b) => a + b, 0);
   assert.deepEqual(M.stageAt(standard, 0), { index: 0, fraction: 0 });
   assert.deepEqual(M.stageAt(standard, 100), { index: 3, fraction: (100 - .33 - .04 - .12) / 120 });
-  assert.deepEqual(M.stageAt(standard, end), { index: 9, fraction: 1 });
+  assert.deepEqual(M.stageAt(standard, end), { index: 8, fraction: 1 });
   assert(M.journey('gulp', 'normal')[0] < standard[0]);
-  assert(M.journey('chew', 'constipation')[7] > standard[7]);
+  assert(M.journey('chew', 'constipation')[6] > standard[6]);
   const meal = [4, 8, 12, 16, 88];
-  const finalStage = { index: 9, fraction: 1 };
+  const finalStage = { index: 8, fraction: 1 };
   const ordinary = M.mealReading(meal, finalStage, 'normal', 'milk');
   assert(M.mealReading(meal, finalStage, 'gallstones', 'milk')[2] < ordinary[2]);
   assert(M.mealReading(meal, finalStage, 'lactose', 'milk')[3] < ordinary[3]);

@@ -101,8 +101,8 @@ const STRUCTURES = {
     name: ['Caecum', '盲腸'],
     role: ['Large intestine', '大腸'],
     summary: [
-      'Undigested material passes from the ileum into the caecum, the pouch at the start of the large intestine, and then enters the colon.',
-      '未能消化的物質從迴腸進入大腸起始處的囊狀構造盲腸，然後進入結腸。'
+      'The caecum is the blind pouch at the start of the large intestine. At the ileocaecal junction, undigested material from the ileum continues upwards into the ascending colon.',
+      '盲腸是大腸起始處的一端封閉的囊狀構造。未能消化的物質從迴腸經迴盲交界向上進入升結腸。'
     ],
     related: ['appendix']
   },
@@ -188,15 +188,15 @@ const STRUCTURES = {
     name: ['Appendix', '闌尾'],
     role: ['Branch of the caecum', '與盲腸相連'],
     summary: [
-      'The appendix is a narrow, blind-ended branch of the caecum. Food does not normally pass through it. Undigested material moves from the ileum into the caecum and then into the colon.',
-      '闌尾是連接盲腸的一端封閉的細管。食物通常不會經過闌尾。未能消化的物質由迴腸進入盲腸，再進入結腸。'
+      'The appendix is a narrow, blind-ended branch of the caecum. Food does not normally pass through it. Undigested material continues upwards into the ascending colon at the ileocaecal junction.',
+      '闌尾是連接盲腸的一端封閉的細管。食物通常不會經過闌尾。未能消化的物質從迴腸經迴盲交界向上進入升結腸。'
     ],
     related: ['caecum']
   }
 };
 
-const FOOD_PATH = ['mouth', 'pharynx', 'oesophagus', 'stomach', 'duodenum', 'ileum', 'caecum', 'colon', 'rectum', 'anus'];
-const ASSOCIATED = ['salivary', 'liver', 'gallbladder', 'bileDuct', 'pancreas', 'pancreaticDuct', 'appendix'];
+const FOOD_PATH = ['mouth', 'pharynx', 'oesophagus', 'stomach', 'duodenum', 'ileum', 'colon', 'rectum', 'anus'];
+const ASSOCIATED = ['salivary', 'liver', 'gallbladder', 'bileDuct', 'pancreas', 'pancreaticDuct', 'caecum', 'appendix'];
 
 Object.assign(COPY, {
   intro: ['Follow a meal, explore the organs and practise the experiments behind digestion and absorption.', '追蹤食物在消化道的旅程、探索各個構造，並透過實驗了解消化和吸收。'],
